@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./Frontend
+    ports:
+      - "6513:80"
+    restart: always
+
+  hr:
+    build:
+      context: ./HR_Page
+    ports:
+      - "6514:80"
+    restart: always
+
+  backend:
+    build:
+      context: ./Backend
+    ports:
+      - "3211:3211"
+    restart: always
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=admin234
+      - DB_NAME=new_employee_db
+      - PG_HOST=postgres
+      - DB_PORT=5432
+      - NODE_ENV=production
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5101:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin234
+      POSTGRES_DB: new_employee_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  pgdata:
+
